@@ -1,0 +1,27 @@
+{
+  "name": "Neo4jSinkConnector",
+  "config": {
+    "topics": "customers,orders",
+    "kafka.bootstrap.servers": "broker:9092",
+    "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": true,
+    "key.converter.schema.registry.url": "http://schema-registry:8081",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": true,
+    "value.converter.schema.registry.url": "http://schema-registry:8081",
+    "errors.retry.timeout": "-1",
+    "errors.retry.delay.max.ms": "1000",
+    "errors.tolerance": "all",
+    "errors.log.enable": true,
+    "errors.deadletterqueue.topic.name": "test-error-topic",
+    "errors.log.include.messages": true,
+    "errors.deadletterqueue.topic.replication.factor": 1,
+    "neo4j.server.uri": "neo4j+s://d5922e27.databases.neo4j.io:7687",
+    "neo4j.authentication.basic.username": "neo4j",
+    "neo4j.authentication.basic.password": "QV5hV6ZWg4CoclYfjwl7x-AS0h9iao9Io7sSVdzBe04",
+    "neo4j.encryption.enabled": false,
+    "neo4j.topic.cypher.customers": "WITH event CALL {WITH event WITH event WHERE event.op IN [\"c\",\"u\",\"r\"] WITH event[\"after\"] AS evData MERGE (c:Customer{customerId:evData.customerNumber}) ON CREATE SET c.name = evData.customerName ON MATCH SET c.name = evData.customerName UNION WITH event WITH event WHERE event.op IN [\"d\"] WITH event[\"before\"] AS evData MATCH (c:Customer{customerId:evData.customerNumber}) WITH c OPTIONAL MATCH (c)-[:PLACED_ORDER]->(o) DETACH DELETE c,o }",
+    "neo4j.topic.cypher.orders": "WITH event CALL {WITH event WITH event WHERE event.op IN [\"c\",\"u\",\"r\"] WITH event[\"after\"] AS evData MERGE (c:Customer{customerId:evData.customerNumber}) MERGE (o:Order{orderId:evData.orderNumber}) ON CREATE SET o.status = evData.status ON MATCH SET o.status = evData.status MERGE (c)-[:PLACED_ORDER]->(o) UNION WITH event WITH event WHERE event.op IN [\"d\"] WITH event[\"before\"] AS evData MATCH (o:Order{orderId:evData.orderNumber}) DETACH DELETE o }"
+  }
+}
